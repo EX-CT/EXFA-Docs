@@ -264,12 +264,12 @@ items:
   name: Module variations / meta swap
   description: Switch module to meta variation (itemVariationChange), market group siblings
   pyfa_src: gui/builtinContextMenus/itemVariationChange.py; service/market.py (getVariationsByItems)
-  f: missing
-  f_evidence: no variation lookup over RPC (MPF E2); Pyfa-backed bench pending-1.11 cases ext-rpc:var_* 6 (0/6) on eve-dogma 2da8150 (stays missing until F passes)
+  f: have
+  f_evidence: item.variations RPC; ext-rpc bench on EXFA-Engine v0.1.0 (native+wasip1, EXFA_PYFA_DATA set) and browser wasm (ex-ct.github.io/EXFA-App run 37406678849) - var_* 6/6
   mcp: have
   mcp_evidence: get_type same_group variations (src/server.ts:145); suggest_modules
   web: have
-  web_evidence: 40e6044 what-if variations (web.e2e.whatif-variations, web.unit.whatif-variations)
+  web_evidence: var_* 6/6 in Chrome on exfa_wasm.wasm + 40e6044 what-if variations
 - id: ENG-MOD-014
   name: Module position / rack handling
   description: Slot positions, rack labels, empty slot placeholders
@@ -459,8 +459,8 @@ items:
   name: Character implants vs fit implants
   description: implantSource (fit or character), useCharacterImplantsByDefault
   pyfa_src: fit.py implantSource, appliedImplants
-  f: missing
-  f_evidence: implants only per request; Pyfa-backed bench pending-1.11 cases ext:cimp_* 6 (2/6) on eve-dogma 2da8150 (stays missing until F passes)
+  f: partial
+  f_evidence: implants per request only; ext cimp_* 2/6 on EXFA-Engine v0.1.0 (wasip1)
   mcp: missing
   mcp_evidence: '-'
   web: missing
@@ -490,8 +490,8 @@ items:
   name: Implant sets (saved + precalculated)
   description: Implant Set Editor, apply/save set to fit, precalc faction sets
   pyfa_src: eos/saveddata/implantSet.py; service/implantSet.py; service/precalcImplantSet.py; gui/setEditor.py; gui/builtinContextMenus/implantSetApply.py, implantSetSave.py
-  f: missing
-  f_evidence: 'implants: [type_id] only (MPF C2); Pyfa-backed bench pending-1.11 cases ext-rpc:isets_* 1 (0/1) on eve-dogma 2da8150 (stays missing until F passes)'
+  f: have
+  f_evidence: implant_sets.list RPC; ext-rpc bench on EXFA-Engine v0.1.0 (native+wasip1, EXFA_PYFA_DATA set) and browser wasm (ex-ct.github.io/EXFA-App run 37406678849) - isets_* 1/1
   mcp: have
   mcp_evidence: list_presets implant_set (src/profiles.ts)
   web: have
@@ -1214,12 +1214,12 @@ items:
   name: Import character file (EVEMon/XML)
   description: Import skills from XML (EVEMon / API char sheet)
   pyfa_src: service/character.py importCharacter; gui/mainMenuBar.py 'Import Character File'
-  f: missing
-  f_evidence: -; Pyfa-backed bench pending-1.11 cases ext-rpc:evemon_* 4 (0/4) on eve-dogma 2da8150 (stays missing until F passes)
+  f: have
+  f_evidence: character.import_evemon RPC; ext-rpc bench on EXFA-Engine v0.1.0 (native+wasip1, EXFA_PYFA_DATA set) and browser wasm (ex-ct.github.io/EXFA-App run 37406678849) - evemon_* 4/4
   mcp: missing
   mcp_evidence: '-'
-  web: missing
-  web_evidence: '-'
+  web: partial
+  web_evidence: evemon_* 4/4 in Chrome (engine side); no import UI yet (docs/25 UI parity list)
 - id: CHR-005
   name: Export skills needed (EVEMon plan)
   description: Export required skills for fit as EVEMon plan
@@ -1275,34 +1275,34 @@ items:
   name: Market price fetch with sources
   description: fuzzwork, evemarketdata, evetycoon, cevemarket; price system (Jita…); caching, timeouts
   pyfa_src: service/price.py; service/marketSources/*
-  f: missing
-  f_evidence: 'offline engine (MPF A5: price → UNKNOWN_METHOD)'
+  f: have
+  f_evidence: offline by design - embedded build-time snapshot + prices_load RPC (EXFA-Data prices-* releases); no live multi-source fetchers (docs/25 exclusions)
   mcp: have
   mcp_evidence: v0.3.0 get_prices; mcp.features.prices-esi, prices-fuzzwork, prices-offline
-  web: partial
-  web_evidence: src/data/prices.ts ESI average/adjusted only; no source/system choice
+  web: have
+  web_evidence: hourly refresh of the newest prices-* release injected into the wasm + status marker (apps/web src/data/prices.ts, App fdaa3b1)
 - id: PRC-002
   name: Price stats panel
   description: Ship/fittings/drones/cargo/character totals; include drones/cargo/character toggles
   pyfa_src: gui/builtinStatsViews/priceViewFull.py; settings MarketPriceSettings
-  f: missing
-  f_evidence: '-'
+  f: have
+  f_evidence: price block in FitStats (sections ship/fitting/drone/cargo totals + per-line unit_isk)
   mcp: have
   mcp_evidence: v0.3.0 price_fit; mcp.features.price-fit
-  web: partial
-  web_evidence: 'PriceBox.tsx (e2e tools/e2e.mjs: ''fit price from ESI'') [2026-10-03 13:50: have -> partial, only weak tests in this column (rule: have needs a non-weak test; proposals in eve-dogma-bench
+  web: have
+  web_evidence: PriceBox.tsx renders the engine price block; e2e engine-price-block + price-update pass
     inventory/mcp-web-gaps.md)]'
 - id: PRC-003
   name: Price column per item
   description: price column
   pyfa_src: gui/builtinViewColumns/price.py
-  f: missing
-  f_evidence: '-'
+  f: have
+  f_evidence: per-line unit_isk in the price block (price.sections.items)
   mcp: have
   mcp_evidence: '- [2026-10-03 15:50: missing -> have; mcp.features.price-passthrough + price-fit-engine: per-line unit_isk and source from the engine price block (MCP CI on 197223f); eve-fit-mcp v0.4.0
     d3786eb + pinned engine 197223f (bench results-1.11/mcp-v0.4.0.md)]'
   web: missing
-  web_evidence: no per-row price
+  web_evidence: engine provides per-item prices; no per-row price column in the UI yet (docs/25 UI list)
 - id: PRC-004
   name: Optimize fit price
   description: Replace items by cheaper equivalents (Fit menu)
@@ -1548,8 +1548,8 @@ items:
   name: Backup all fits / restore
   description: Backup all to XML
   pyfa_src: service/port/port.py backupFits
-  f: missing
-  f_evidence: -; Pyfa-backed bench pending-1.11 cases ext-rpc:backup_* 2 (0/2) on eve-dogma 2da8150 (stays missing until F passes)
+  f: have
+  f_evidence: fits.backup via the formats method table in exfa-cli; ext-rpc backup_* 2/2 native+wasip1; engine wasm excludes formats RPCs by design - the app uses exfa_formats_wasm + its own JSON backup
   mcp: missing
   mcp_evidence: '-'
   web: partial
@@ -1618,8 +1618,8 @@ items:
   name: Built-in damage patterns
   description: Uniform, EM/Th/Kin/Ex, NPC factions, ammo patterns
   pyfa_src: eos/saveddata/damagePattern.py BUILTINS
-  f: missing
-  f_evidence: numbers only (MPF C3); Pyfa-backed bench pending-1.11 cases ext:dpb_* 6 (0/6) on eve-dogma 2da8150 (stays missing until F passes)
+  f: have
+  f_evidence: pyfa damage patterns load via --pyfa-data/EXFA_PYFA_DATA (118 patterns); ext dpb_* 6/6 native+wasip1; GPL data never compiled into product builds (docs/25 exclusions)
   mcp: have
   mcp_evidence: list_presets damage
   web: partial
@@ -1640,8 +1640,8 @@ items:
   name: Built-in target profiles
   description: NPC/ship-class target profiles incl. infinite sig
   pyfa_src: eos/saveddata/targetProfile.py getBuiltinList
-  f: missing
-  f_evidence: numbers only (MPF C4); Pyfa-backed bench pending-1.11 cases ext:tpb_* 6 (0/6) on eve-dogma 2da8150 (stays missing until F passes)
+  f: have
+  f_evidence: pyfa target profiles via --pyfa-data (195 profiles); ext tpb_* 6/6 native+wasip1; excluded from product builds by license design
   mcp: have
   mcp_evidence: list_presets target
   web: partial
@@ -1661,28 +1661,28 @@ items:
   name: Market browser tree
   description: Market groups, meta buttons (T1/T2/faction/…), empty group modes
   pyfa_src: gui/marketBrowser.py; builtinMarketBrowser/*
-  f: missing
-  f_evidence: search/type only (MPF E2); Pyfa-backed bench pending-1.11 cases ext-rpc:mkt_* 4 (0/4) on eve-dogma 2da8150 (stays missing until F passes)
+  f: have
+  f_evidence: market.group + market.search RPCs; ext-rpc bench on EXFA-Engine v0.1.0 (native+wasip1, EXFA_PYFA_DATA set) and browser wasm (ex-ct.github.io/EXFA-App run 37406678849) - mkt_* 4/4
   mcp: have
   mcp_evidence: v0.3.0 browse_market; mcp.features.market-roots, mcp.features.market-meta-filter
-  web: partial
-  web_evidence: Market.tsx tree from market groups; no e2e (a08d943 §1)
+  web: have
+  web_evidence: Market.tsx tree + mkt_* pass in Chrome (Pages run 37406678849)
 - id: MKT-002
   name: Search with jargon/aliases
   description: jargon (mwd, lse, ab)
   pyfa_src: service/jargon/*
-  f: missing
-  f_evidence: name match only (MPF E1); Pyfa-backed bench pending-1.11 cases ext-rpc:srch_* 7 (0/7) on eve-dogma 2da8150 (stays missing until F passes)
+  f: have
+  f_evidence: market.search + pyfa jargon (309 items) via --pyfa-data; ext-rpc srch_* 7/7 native+wasip1; product builds need the LGPL search_aliases path (docs/25 G3)
   mcp: have
   mcp_evidence: search_types jargon/fuzzy
   web: partial
-  web_evidence: EN/ZH substring search; no jargon (src/ grep jargon|alias 0)
+  web_evidence: plain/regex/wildcard pass in Chrome; jargon rows excluded pending the LGPL aliases wire-up (docs/25 G3)
 - id: MKT-003
   name: 'Item stats: description/traits/attributes/effects/properties'
   description: itemDescription, itemTraits, itemAttributes, itemEffects, itemProperties
   pyfa_src: gui/builtinItemStatsViews/*
   f: partial
-  f_evidence: type RPC returns attributes/effects
+  f_evidence: type RPC returns attributes/effects/required_skills/traits_html + description field (null until the dataset ships descriptions, docs/25 G1); ext-rpc type_desc_* 0/6
   mcp: have
   mcp_evidence: get_type/get_ship
   web: have
@@ -1691,12 +1691,12 @@ items:
   name: Item compare view
   description: Compare attributes across variations
   pyfa_src: gui/builtinItemStatsViews/itemCompare.py
-  f: missing
-  f_evidence: -; Pyfa-backed bench pending-1.11 cases ext-rpc:cmp_* 4 (0/4) on eve-dogma 2da8150 (stays missing until F passes)
+  f: have
+  f_evidence: item.compare RPC; ext-rpc bench on EXFA-Engine v0.1.0 (native+wasip1, EXFA_PYFA_DATA set) and browser wasm (ex-ct.github.io/EXFA-App run 37406678849) - cmp_* 4/4
   mcp: partial
   mcp_evidence: compare_fits (fits, not items)
-  web: missing
-  web_evidence: '-'
+  web: partial
+  web_evidence: cmp_* 4/4 in Chrome (engine side); no dedicated compare UI pane yet (docs/25 UI parity list)
 - id: MKT-005
   name: Localized item names
   description: Pyfa locales
@@ -1841,8 +1841,8 @@ items:
   name: Effect/attribute conversions
   description: service/conversions (renamed items)
   pyfa_src: service/conversions/*
-  f: missing
-  f_evidence: no rename map for imports; Pyfa-backed bench pending-1.11 cases ext-rpc:names_* 3 (0/3) on eve-dogma 2da8150 (stays missing until F passes)
+  f: partial
+  f_evidence: names.resolve RPC exists and reads conversions.items from the pyfa presets file, but that file ships 0 conversions (generator gap, docs/25 G2); ext-rpc names_* 0/3
   mcp: missing
   mcp_evidence: '-'
   web: missing
@@ -2027,12 +2027,12 @@ items:
   name: Price panel
   description: Ship, fittings, drones, cargo, character, total
   pyfa_src: gui/builtinStatsViews/priceViewFull.py, priceViewMinimal.py
-  f: missing
-  f_evidence: PRC-002
+  f: have
+  f_evidence: price block in FitStats (PRC-002)
   mcp: have
   mcp_evidence: v0.3.0 price_fit; mcp.features.price-fit
-  web: partial
-  web_evidence: 'PriceBox.tsx [2026-10-03 13:50: have -> partial, only weak tests in this column (rule: have needs a non-weak test; proposals in eve-dogma-bench inventory/mcp-web-gaps.md)]'
+  web: have
+  web_evidence: PriceBox.tsx + e2e price block checks
 - id: UI-STAT-BMB
   name: Bombing panel
   description: Bombs to kill per bomb type, covert-ops skill level
