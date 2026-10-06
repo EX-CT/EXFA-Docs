@@ -1,4 +1,4 @@
-# 25 — Deployment options for the EXFA web app
+# 26 — Deployment options for the EXFA web app
 
 Status: research, recommendation at the bottom. Written 2026-10-05 after the
 EXFA-App migration landed (site live at https://ex-ct.github.io/EXFA-App/).

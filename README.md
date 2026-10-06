@@ -51,6 +51,9 @@ the products built on it (EXFA Desktop, EXFA Web, EXFA Cloud, EXFA MCP). This re
 | 21 | [optimizer-and-character-input](docs/21-optimizer-and-character-input.md) | 现行 | 优化器接口与角色/技能输入格式 |
 | 22 | [embedded-sde-and-prices](docs/22-embedded-sde-and-prices.md) | 现行（部分） | §2 运行时 SDE 注入（`.edp`）作废，见 00 原则 3；价格快照格式 §3–§5 现行 |
 | 23 | [batch-api-and-prices](docs/23-batch-api-and-prices.md) | 现行 | 批量 API 与价格层 |
+| 24 | [migration-handoff](docs/24-migration-handoff.md) | 历史 | eve-* → EXFA-* 迁移交接（已完成） |
+| 25 | [pyfa-parity-audit](docs/25-pyfa-parity-audit.md) | 现行 | 迁移后 Pyfa 功能对齐审计 |
+| 26 | [deployment-options](docs/26-deployment-options.md) | 参考 | web 部署方案调研（Pages 已上线，Cloudflare 备选） |
 
 旧项目的交接文档、进度记录、草稿和工具存档于 [`history/eve-fit-docs/`](history/eve-fit-docs/)。
 `tools/render_inventory.py` 由 19 的 YAML 生成其 Markdown 表格与 CSV。

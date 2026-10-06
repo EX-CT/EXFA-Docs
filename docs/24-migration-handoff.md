@@ -1,6 +1,6 @@
 # 24 — 迁移交接 / Migration handoff
 
-状态：迁移进行中　·　更新：2026-10-05　·　总规划见 [00-architecture-plan.md](00-architecture-plan.md)
+状态：迁移完成（旧 eve-* 仓库已删除，git 历史与 release 资产归档于 [EX-CT/history](https://github.com/EX-CT/history)）　·　更新：2026-10-06　·　总规划见 [00-architecture-plan.md](00-architecture-plan.md)
 
 ## 当前状态
 
