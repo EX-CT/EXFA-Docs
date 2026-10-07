@@ -14,7 +14,7 @@ App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `desig
 | [EXFA-Format](https://github.com/EX-CT/EXFA-Format) | v1 **已完成** | `v1.0.0`（schema + TS `@exfa/format` + Rust `exfa-format` + migrate/resolve + 目录导出布局） |
 | [EXFA-Data](https://github.com/EX-CT/EXFA-Data) | 正常运行 | Latest = `sde-3579973-r7`；价格快照每天发布（`prices-jita44-*`） |
 | [EXFA-Bench](https://github.com/EX-CT/EXFA-Bench) | CI 已修复，bench-ci 绿（见 §3.2） | presets `presets-pyfa-3569502-r6` |
-| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A 已合并；**Stage B 进行中**；Stage C/D 未开始；Pages 已恢复部署（见 §3.1） | PR #1 已合并，PR #2 开着 |
+| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A、**Stage B 已合并上线**；Stage C/D 未开始；Pages 已恢复部署（见 §3.1） | PR #2 已合并（`8a6d84d`） |
 | EXFA-Docs | 本文档 | |
 
 ## 2. 已完成
@@ -53,16 +53,13 @@ Stage A 合并后，`pages` workflow 的 bench 门禁报 `formats` 0/4779，部�
 
 已合并（EXFA-Bench #4），main 上 bench-ci 已转绿，issue #1 已关闭。
 
-### 3.3 App Stage B（[PR #2](https://github.com/EX-CT/EXFA-App/pull/2)，分支 `devin/1791318840-v2-market`）
+### 3.3 App Stage B（[PR #2](https://github.com/EX-CT/EXFA-App/pull/2)，已合并 `8a6d84d`，已上线）
 
-代码已基本写完：紧凑市场、智能/替换/添加模式、单击预览与双击应用、对比条（变种、弹药、离线、角色），每一行都由引擎真算。
+紧凑市场、智能/替换/添加模式、单击预览与双击应用、对比条（变种、弹药、离线、角色），每一行都由引擎真算。
 
-验收还缺：
-1. 完整跑一遍 `tools/e2e.mjs`（上次被中断）。
-2. 1920×1080 和 1600×900 下截图并目视检查。
-3. 修完问题后合并。
+验收已完成：e2e 105/105（修掉了从未跑通过的测试脚本问题：已移除的 puppeteer API、`{clickCount}`、`'Control+a'` 组合键写法、单击装件改为双击 Add 模式、Windows 路径 `fileURLToPath`）；1920×1080 与 1600×900 截图目视通过（`tools/shots.mjs`）；CI 与 pages 部署均绿。
 
-具体清单见 App 的 `docs/v2/HANDOFF.md`。
+细节见 App 的 `docs/v2/HANDOFF.md`（已在 main）。
 
 ### 3.4 App Stage D、Stage C（未开始，按这个顺序做）
 
