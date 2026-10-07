@@ -1,6 +1,6 @@
 # 27 — v2 交接 / v2 handoff
 
-状态：进行中（App Stage B 待验收）　·　更新：2026-10-07　·　前一份交接（迁移，已完成）见 [24](24-migration-handoff.md)
+状态：进行中（下一项：App Stage D）　·　更新：2026-10-07　·　前一份交接（迁移，已完成）见 [24](24-migration-handoff.md)
 
 这份文档汇总 EXFA v2 大升级的进度，覆盖全部仓库，换环境（云端 ↔ 本地）后从这里接手。
 App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `design.md`、实现规格 `app-v2-spec.md`、格式规格 `format-v1-spec.md`、App 侧状态 `HANDOFF.md`）。
@@ -10,11 +10,11 @@ App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `desig
 
 | 仓库 | 状态 | 最新 |
 |---|---|---|
-| [EXFA-Engine](https://github.com/EX-CT/EXFA-Engine) | v2 所需功能**已完成** | release `v0.2.0`（契约 1.5.0），main CI 绿 |
+| [EXFA-Engine](https://github.com/EX-CT/EXFA-Engine) | v2 所需功能**已完成** | release `v0.2.1`（契约 1.5.0，内置 `sde-3586130-r7`），main CI 绿 |
 | [EXFA-Format](https://github.com/EX-CT/EXFA-Format) | v1 **已完成** | `v1.0.0`（schema + TS `@exfa/format` + Rust `exfa-format` + migrate/resolve + 目录导出布局） |
-| [EXFA-Data](https://github.com/EX-CT/EXFA-Data) | 正常运行 | Latest = `sde-3579973-r7`；价格快照每天发布（`prices-jita44-*`） |
-| [EXFA-Bench](https://github.com/EX-CT/EXFA-Bench) | CI 已修复，bench-ci 绿（见 §3.2） | presets `presets-pyfa-3569502-r6` |
-| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A、**Stage B 已合并上线**；Stage C/D 未开始；Pages 已恢复部署（见 §3.1） | PR #2 已合并（`8a6d84d`） |
+| [EXFA-Data](https://github.com/EX-CT/EXFA-Data) | 正常运行 | Latest = `sde-3586130-r7`；价格快照每天发布（`prices-jita44-*`） |
+| [EXFA-Bench](https://github.com/EX-CT/EXFA-Bench) | CI 已修复，bench-ci 绿（见 §3.2）；预期 SDE build 改从 `$EXFA_DATASET` 读取（见 §3.5） | presets `presets-pyfa-3569502-r6` |
+| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A、**Stage B 已合并上线**；Stage C/D 未开始；Pages 已恢复部署（见 §3.1） | 引擎 WASM 已升级 `v0.2.1`（`ba9c3a4`） |
 | EXFA-Docs | 本文档 | |
 
 ## 2. 已完成
@@ -66,19 +66,17 @@ Stage A 合并后，`pages` workflow 的 bench 门禁报 `formats` 0/4779，部�
 - **Stage D**：配置库改为 EXFA-Format 存储，包括文件夹、可替代件、分支、历史、编队/指挥、投影配置；IndexedDB 迁移要保留旧的 `eve-fit-web*` 存储；手动导入导出支持单个 fit、文件夹和 zip。
 - **Stage C**：场景编辑器加图表坞。多个配置乘多个目标画多条线，最多 12 条；支持引擎全部横轴、图例开关、十字准线、CSV/PNG 导出。
 
-### 3.5 SDE 版本不一致（引擎侧，未做）
+### 3.5 SDE 版本不一致（已修复：引擎 `v0.2.1` 内置 `sde-3586130-r7`）
 
-EXFA-Data 的 Latest 已是 `sde-3579973-r7`，但引擎 `sde.lock` 仍是 `sde-3569502-r7`。新 SDE 发布后没有触发引擎重建：可能是 `EXFA_DISPATCH_TOKEN` 没配，这一点还没核实。
+已修。引擎 `v0.2.1`（提交 `f2dc7e7`）内置 `sde-3586130-r7`，与界面数据集一致；App 已钉用 v0.2.1 WASM 并部署（`ba9c3a4`）。
 
-后果：网页界面层用的是 3579973 的 dataset，WASM 引擎内置的是 3569502。两者之间新增的物品，界面上能看到，引擎却算不了。
+这次升级暴露并修掉了三个流水线问题：
 
-修法：
-1. 手动运行 EXFA-Engine 的 `sde-update` workflow，输入 `sde-3579973-r7`；或者本地改 `sde.lock`。
-2. 重算 `ci/round1.sha256` 和 `ci/round1-base.sha256`，并把版本号升到 0.2.1 后再计算 hash。
-3. 在 `packages/mcp` 用新的二进制跑一遍 `npm test`。
-4. 发布 `v0.2.1`。
+1. **Bench fixture 钉死旧 build**（EXFA-Bench #5）：`sde`/`price_inject`/`batch` 套件的 runner 和生成数据硬编码 `SDE_BUILD=3569502`，门禁对 3586130 引擎报了 ~100 个元数据失败。现在 `SDE_BUILD` 从 `$EXFA_DATASET` 的 `sde.build` 读取，fixture 用 `d22/tools/gen_d22.py`、`batch/tools/gen_gap_cases.py` 重新生成；`snap-other-build` 仍固定 3500000（故意测外来 build 警告）。
+2. **bench.lock 与 sde.lock 的更新顺序死锁**：`ci.yml`/`sde-update.yml` 新增 `bench_sha` 输入——门禁可以用未合并的 Bench 提交跑，`sde-update` 的 update 任务把该 sha 和 `sde.lock` 写进同一个提交，main 上每个提交都自洽。
+3. **release.yml artifact 污染**：sde-update → ci 门禁 → release 同处一个 workflow run，`manifest` 任务的无 pattern `merge-multiple` 下载把门禁的 `ci-results-*`（`out/<suite>/` 目录）混进 `dist/`，`sha256sum -- *` 遇目录报错。包产物改名 `pkg-*` 并按 pattern 下载。
 
-另一种做法：Pages 改为固定使用引擎 `release.json` 里的 `sde_tag`，保证界面层和引擎是同一版 SDE。
+另外 `EXFA_DISPATCH_TOKEN` 确实没配（EXFA-Data 侧日志：`dispatch skipped`）。没有再依赖 PAT：`sde-update` 现在每 6 小时轮询 EXFA-Data 最新 `sde-*` release（仓库是 public，GITHUB_TOKEN 可读），自动走完升级流水线；repository_dispatch 通道保留为快车道。手动触发时不填 tag 也会取最新 release。
 
 ### 3.6 杂项
 
@@ -90,7 +88,7 @@ EXFA-Data 的 Latest 已是 `sde-3579973-r7`，但引擎 `sde.lock` 仍是 `sde-
 - App 的测试要在 `apps/web` 目录里跑：`npx tsc -b && npx vitest run && npx vite build`。在仓库根目录跑 vitest 会扫到 `packages/mcp/dist`。
 - 浏览器工具（`tools/smoke.mjs`、`e2e.mjs`、`screenshot.mjs`、`browser-rpc.mjs`）需要用 `CHROME` 环境变量指定 Chrome 路径，默认值是 `/usr/bin/google-chrome`。
 - 本地预览：`npx vite build && npx vite preview --port 4173`，然后打开 `http://127.0.0.1:4173/EXFA-App/`。
-- 本地构建 Engine 需要设置 `EXFA_DATASET=<dataset-3569502-r7.json.gz>`。不要对整个仓库跑 `cargo fmt`：仓库本身没有按 rustfmt 格式化，跑一次会改动几十个文件。
+- 本地构建 Engine 需要设置 `EXFA_DATASET=<dataset-3586130-r7.json.gz>`（或 `sde.lock` 里钉的那版）。不要对整个仓库跑 `cargo fmt`：仓库本身没有按 rustfmt 格式化，跑一次会改动几十个文件。
 - 改了 MCP 工具描述后要跑 `npm run schemas`，CI 会比对 schema 快照。
 - 发布 Engine 时先合并 PR，`fetch origin/main` 之后再在合并提交上打 tag。另外 App 的 `mcp-engine` CI 用的是最新的 Engine release，所以发版前先在 `packages/mcp` 用新的二进制跑一遍测试。
 - Commit 结尾的署名：`Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>`。
