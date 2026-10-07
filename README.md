@@ -16,6 +16,7 @@ the products built on it (EXFA Desktop, EXFA Web, EXFA Cloud, EXFA MCP). This re
 | [EXFA-App](https://github.com/EX-CT/EXFA-App) | EXFA Desktop / Web / Cloud / MCP（TypeScript monorepo） |
 | [EXFA-Data](https://github.com/EX-CT/EXFA-Data) | SDE 管线、预设、缩写表、价格快照工具 |
 | [EXFA-Bench](https://github.com/EX-CT/EXFA-Bench) | 契约测试用例与 Pyfa 对照 |
+| [EXFA-Format](https://github.com/EX-CT/EXFA-Format) | EXFA 自有配置格式（Fit / FitDocument / Library；schema + TS + Rust） |
 | EXFA-Docs | 设计文档（本仓库） |
 
 ## 文档 / Documents
@@ -54,6 +55,7 @@ the products built on it (EXFA Desktop, EXFA Web, EXFA Cloud, EXFA MCP). This re
 | 24 | [migration-handoff](docs/24-migration-handoff.md) | 历史 | eve-* → EXFA-* 迁移交接（已完成） |
 | 25 | [pyfa-parity-audit](docs/25-pyfa-parity-audit.md) | 现行 | 迁移后 Pyfa 功能对齐审计 |
 | 26 | [deployment-options](docs/26-deployment-options.md) | 参考 | web 部署方案调研（Pages 已上线，Cloudflare 备选） |
+| 27 | [v2-handoff](docs/27-v2-handoff.md) | 现行 | v2 大升级进度与交接（全部仓库；App 细节见 EXFA-App `docs/v2/`） |
 
 旧项目的交接文档、进度记录、草稿和工具存档于 [`history/eve-fit-docs/`](history/eve-fit-docs/)。
 `tools/render_inventory.py` 由 19 的 YAML 生成其 Markdown 表格与 CSV。
