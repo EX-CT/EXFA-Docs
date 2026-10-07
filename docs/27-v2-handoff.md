@@ -13,8 +13,8 @@ App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `desig
 | [EXFA-Engine](https://github.com/EX-CT/EXFA-Engine) | v2 所需功能**已完成** | release `v0.2.0`（契约 1.5.0），main CI 绿 |
 | [EXFA-Format](https://github.com/EX-CT/EXFA-Format) | v1 **已完成** | `v1.0.0`（schema + TS `@exfa/format` + Rust `exfa-format` + migrate/resolve + 目录导出布局） |
 | [EXFA-Data](https://github.com/EX-CT/EXFA-Data) | 正常运行 | Latest = `sde-3579973-r7`；价格快照每天发布（`prices-jita44-*`） |
-| [EXFA-Bench](https://github.com/EX-CT/EXFA-Bench) | CI 修复中（见 §3.2） | presets `presets-pyfa-3569502-r6` |
-| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A 已合并；**Stage B 进行中**；Stage C/D 未开始；Pages 部署修复中（见 §3.1） | PR #1 已合并，PR #2 开着 |
+| [EXFA-Bench](https://github.com/EX-CT/EXFA-Bench) | CI 已修复，bench-ci 绿（见 §3.2） | presets `presets-pyfa-3569502-r6` |
+| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A 已合并；**Stage B 进行中**；Stage C/D 未开始；Pages 已恢复部署（见 §3.1） | PR #1 已合并，PR #2 开着 |
 | EXFA-Docs | 本文档 | |
 
 ## 2. 已完成
@@ -38,20 +38,20 @@ App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `desig
 
 ## 3. 未完成 / 已知问题
 
-### 3.1 App Pages 部署自 Stage A 合并后一直失败（修复中）
+### 3.1 App Pages 部署自 Stage A 合并后一直失败（已修复，EXFA-App #3）
 
 Stage A 合并后，`pages` workflow 的 bench 门禁报 `formats` 0/4779，部署没有执行，线上站点还是 Stage A 之前的版本。
 
-原因在测试工具，产品代码没问题。Stage A 删掉了 TS 解析器，格式转换改走引擎 RPC。`apps/web/tools/browser-rpc.mjs` 把 `rpcRaw` 返回的 `{id,result}` 信封又包了一层 `result`，bench 读到的结构因此全部对不上。修复分支是 `devin/1791378812-fix-pages-formats-rpc`。合并后要确认 Pages 部署成功，并确认线上站点已是 Stage A。
+原因在测试工具，产品代码没问题。Stage A 删掉了 TS 解析器，格式转换改走引擎 RPC。`apps/web/tools/browser-rpc.mjs` 把 `rpcRaw` 返回的 `{id,result}` 信封又包了一层 `result`，bench 读到的结构因此全部对不上。修复分支是 `devin/1791378812-fix-pages-formats-rpc`。已合并（EXFA-App #3），合并后 `pages` 的 build/deploy 均成功，线上站点已是 Stage A。
 
-### 3.2 EXFA-Bench bench-ci 红（修复中）
+### 3.2 EXFA-Bench bench-ci 红（已修复，EXFA-Bench #4）
 
 `nightly.yml` 还在从已删除的 `EX-CT/eve-sde-pipeline`、`EX-CT/eve-fit-docs` 下载数据。修复分支 `devin/1791378812-ci-exfa-data-sources` 把来源改成：
 - dataset：EXFA-Data `sde-3569502-r7`；
 - presets：EXFA-Bench `presets-pyfa-3569502-r6`；
 - 功能清单：EXFA-Docs。
 
-CI 转绿后关掉 Bench issue #1 "Nightly bench failure"。
+已合并（EXFA-Bench #4），main 上 bench-ci 已转绿，issue #1 已关闭。
 
 ### 3.3 App Stage B（[PR #2](https://github.com/EX-CT/EXFA-App/pull/2)，分支 `devin/1791318840-v2-market`）
 
