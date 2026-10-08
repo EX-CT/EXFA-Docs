@@ -1,10 +1,9 @@
 # 27 — v2 交接 / v2 handoff
 
-状态：进行中（下一项：App Stage D）　·　更新：2026-10-07　·　前一份交接（迁移，已完成）见 [24](24-migration-handoff.md)
+状态：进行中（下一项：App Stage C）　·　更新：2026-10-08　·　前一份交接（迁移，已完成）见 [24](24-migration-handoff.md)
 
 这份文档汇总 EXFA v2 大升级的进度，覆盖全部仓库，换环境（云端 ↔ 本地）后从这里接手。
-App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `design.md`、实现规格 `app-v2-spec.md`、格式规格 `format-v1-spec.md`、App 侧状态 `HANDOFF.md`）。
-目前这些文件只在 Stage B 分支上，[EXFA-App#2](https://github.com/EX-CT/EXFA-App/pull/2) 合并后进入 main。
+App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `design.md`、实现规格 `app-v2-spec.md`、格式规格 `format-v1-spec.md`、App 侧状态 `HANDOFF.md`），均在 main 上。
 
 ## 1. 总表
 
@@ -14,7 +13,7 @@ App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `desig
 | [EXFA-Format](https://github.com/EX-CT/EXFA-Format) | v1 **已完成** | `v1.0.0`（schema + TS `@exfa/format` + Rust `exfa-format` + migrate/resolve + 目录导出布局） |
 | [EXFA-Data](https://github.com/EX-CT/EXFA-Data) | 正常运行 | Latest = `sde-3586130-r7`；价格快照每天发布（`prices-jita44-*`） |
 | [EXFA-Bench](https://github.com/EX-CT/EXFA-Bench) | CI 已修复，bench-ci 绿（见 §3.2）；预期 SDE build 改从 `$EXFA_DATASET` 读取（见 §3.5） | presets `presets-pyfa-3569502-r6` |
-| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A、**Stage B 已合并上线**；Stage C/D 未开始；Pages 已恢复部署（见 §3.1） | 引擎 WASM 已升级 `v0.2.1`（`ba9c3a4`） |
+| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A、**Stage B、Stage D 已合并上线**；Stage C 未开始；Pages 已恢复部署（见 §3.1） | 引擎 WASM `v0.2.1`（`ba9c3a4`）；配置库已迁到 `@exfa/format`（`77e7ee6`） |
 | EXFA-Docs | 本文档 | |
 
 ## 2. 已完成
@@ -61,12 +60,23 @@ Stage A 合并后，`pages` workflow 的 bench 门禁报 `formats` 0/4779，部�
 
 细节见 App 的 `docs/v2/HANDOFF.md`（已在 main）。
 
-### 3.4 App Stage D、Stage C（未开始，按这个顺序做）
+### 3.4 App Stage D（[PR #4](https://github.com/EX-CT/EXFA-App/pull/4)，已合并 `77e7ee6`）
 
-- **Stage D**：配置库改为 EXFA-Format 存储，包括文件夹、可替代件、分支、历史、编队/指挥、投影配置；IndexedDB 迁移要保留旧的 `eve-fit-web*` 存储；手动导入导出支持单个 fit、文件夹和 zip。
-- **Stage C**：场景编辑器加图表坞。多个配置乘多个目标画多条线，最多 12 条；支持引擎全部横轴、图例开关、十字准线、CSV/PNG 导出。
+配置库已迁到 `@exfa/format`（`github:EX-CT/EXFA-Format#v1.0.0`）：
 
-### 3.5 SDE 版本不一致（已修复：引擎 `v0.2.1` 内置 `sde-3586130-r7`）
+- 内部模型换成 `FitDocument`/`Library@1`，引擎请求一律走 `requestFor` → format `resolveFit`（覆盖 refs/links/fleets/scenarios）。
+- IndexedDB `eve-fit-web` 升 v2：`docs` + `kv.index`；旧 `fits`/`kv` 和 localStorage 经 `migrate()` 迁移并原样留作备份。
+- FitBrowser：真·文件夹树（任意层级、拖拽）、编队节点含成员/角色徽章、fit 展开分支+版本历史。
+- fit 头部分支下拉（分歧时带 `*`）+ 保存为分支；对比条新增可替代 tab，模块行 `⇄n` 徽章。
+- 导入导出：单 fit `.exfa.json`；整库 `.zip`（fflate + `toFiles` 目录布局）；`showDirectoryPicker` 文件夹导入导出（不支持时按钮隐藏）；`.exfa.json`/`.zip`/文件夹/旧备份 JSON 全部走 `migrate`/`fromFiles`，按 id+`modified` 合并并显示 导入/更新/跳过 计数。
+- 验收：`tsc`+`vitest` 54/54+`vite build` 绿；smoke-d3 7/7、d4 5/5、d5 4/4；e2e 108/108（新增 `.exfa.json` 导出、`.zip` 导出、zip 合并导入三项）。
+
+### 3.5 App Stage C（未开始，下一项）
+
+- 场景编辑器加图表坞。多个配置乘多个目标画多条线，最多 12 条；支持引擎全部横轴、图例开关、十字准线、CSV/PNG 导出。
+- 依赖 Stage D 已落库的 `Library.scenarios` 与 `doc.refs.scenario_ids`。
+
+### 3.6 SDE 版本不一致（已修复：引擎 `v0.2.1` 内置 `sde-3586130-r7`）
 
 已修。引擎 `v0.2.1`（提交 `f2dc7e7`）内置 `sde-3586130-r7`，与界面数据集一致；App 已钉用 v0.2.1 WASM 并部署（`ba9c3a4`）。
 
@@ -78,7 +88,7 @@ Stage A 合并后，`pages` workflow 的 bench 门禁报 `formats` 0/4779，部�
 
 另外 `EXFA_DISPATCH_TOKEN` 确实没配（EXFA-Data 侧日志：`dispatch skipped`）。没有再依赖 PAT：`sde-update` 现在每 6 小时轮询 EXFA-Data 最新 `sde-*` release（仓库是 public，GITHUB_TOKEN 可读），自动走完升级流水线；repository_dispatch 通道保留为快车道。手动触发时不填 tag 也会取最新 release。
 
-### 3.6 杂项
+### 3.7 杂项
 
 - EXFA-Engine 本地有一份旧 stash（`WIP on 1791223779-gitattributes-eol-lf`），是 crate 合并前的 Cargo.lock 改动。修复早已合并，可以丢弃。
 - 不做的事：后台自动目录同步、桌面端外壳（Tauri）。目前只做手动导入导出；目录结构与将来的桌面端保持一致。
