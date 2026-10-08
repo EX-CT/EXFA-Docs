@@ -1,6 +1,6 @@
 # 27 — v2 交接 / v2 handoff
 
-状态：进行中（下一项：App Stage C）　·　更新：2026-10-08　·　前一份交接（迁移，已完成）见 [24](24-migration-handoff.md)
+状态：App v2 规格 A–D 全部合并上线；剩余收尾（README/文档刷新、终报）　·　更新：2026-10-08　·　前一份交接（迁移，已完成）见 [24](24-migration-handoff.md)
 
 这份文档汇总 EXFA v2 大升级的进度，覆盖全部仓库，换环境（云端 ↔ 本地）后从这里接手。
 App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `design.md`、实现规格 `app-v2-spec.md`、格式规格 `format-v1-spec.md`、App 侧状态 `HANDOFF.md`），均在 main 上。
@@ -13,7 +13,7 @@ App 各阶段的细节规格放在 EXFA-App 的 `docs/v2/`（设计方案 `desig
 | [EXFA-Format](https://github.com/EX-CT/EXFA-Format) | v1 **已完成** | `v1.0.0`（schema + TS `@exfa/format` + Rust `exfa-format` + migrate/resolve + 目录导出布局） |
 | [EXFA-Data](https://github.com/EX-CT/EXFA-Data) | 正常运行 | Latest = `sde-3586130-r7`；价格快照每天发布（`prices-jita44-*`） |
 | [EXFA-Bench](https://github.com/EX-CT/EXFA-Bench) | CI 已修复，bench-ci 绿（见 §3.2）；预期 SDE build 改从 `$EXFA_DATASET` 读取（见 §3.5） | presets `presets-pyfa-3569502-r6` |
-| [EXFA-App](https://github.com/EX-CT/EXFA-App) | Stage A、**Stage B、Stage D 已合并上线**；Stage C 未开始；Pages 已恢复部署（见 §3.1） | 引擎 WASM `v0.2.1`（`ba9c3a4`）；配置库已迁到 `@exfa/format`（`77e7ee6`） |
+| [EXFA-App](https://github.com/EX-CT/EXFA-App) | **Stage A–D 全部合并上线**（C：`1b208a7`，D：`77e7ee6`）；Pages 已恢复部署（见 §3.1） | 引擎 WASM `v0.2.1`（`ba9c3a4`）；配置库已迁到 `@exfa/format`（`77e7ee6`） |
 | EXFA-Docs | 本文档 | |
 
 ## 2. 已完成
@@ -71,10 +71,17 @@ Stage A 合并后，`pages` workflow 的 bench 门禁报 `formats` 0/4779，部�
 - 导入导出：单 fit `.exfa.json`；整库 `.zip`（fflate + `toFiles` 目录布局）；`showDirectoryPicker` 文件夹导入导出（不支持时按钮隐藏）；`.exfa.json`/`.zip`/文件夹/旧备份 JSON 全部走 `migrate`/`fromFiles`，按 id+`modified` 合并并显示 导入/更新/跳过 计数。
 - 验收：`tsc`+`vitest` 54/54+`vite build` 绿；smoke-d3 7/7、d4 5/5、d5 4/4；e2e 108/108（新增 `.exfa.json` 导出、`.zip` 导出、zip 合并导入三项）。
 
-### 3.5 App Stage C（未开始，下一项）
+### 3.5 App Stage C（[PR #5](https://github.com/EX-CT/EXFA-App/pull/5)，已合并 `1b208a7`）
 
-- 场景编辑器加图表坞。多个配置乘多个目标画多条线，最多 12 条；支持引擎全部横轴、图例开关、十字准线、CSV/PNG 导出。
-- 依赖 Stage D 已落库的 `Library.scenarios` 与 `doc.refs.scenario_ids`。
+场景系统 + 图表坞重写，全部走引擎 graph RPC：
+
+- 场景编辑器在左侧「配置文件」tab：列表 + 内联编辑（名称；目标 = 目标抗性 / 库中配置+resist_mode / 自定义数值；距离 km；目标/我方速度 m/s 或 % 切换；角度；目标信号半径覆盖；设置含 ignore_resists 默认关、apply_projected、ignore_lock_range、ignore_drone_control_range、mobile_drone_mode）。内置场景「当前目标 · 10 km 环绕」随库播种（builtin 不落盘）。
+- 右栏「场景」区：勾选写 `doc.refs.scenario_ids`，引擎 `scenario_results` 显示有效 dps/齐射 + 占纸面 %，错误内联。
+- 图表坞：横轴 = `graph_specs` 全部轴（含攻击方速度/角度新轴），每轴单位+默认范围（跃迁距离按 AU 显示）；Y 多选；线源 = 配置多选（分支单列）× 场景多选；按 fit 上 8 色调色板、按场景分线型；图例点击开关、悬停十字线取值、CSV/PNG 导出、上限 12 条（超出有提示）。
+- 细节：扫 `tgt_speed_pct` 时会把场景 params 里的 `tgt_speed_mps` 一并删掉（引擎规则绝对值优先，不删则轴无效）；ewar/remote_reps 只提供 fit 目标的场景（profile 目标在引擎侧被忽略）。
+- 验收：`tsc`+`vitest` 61/61+`vite build` 绿；smoke-c 13/13；e2e 108/108（target-fit / ecm-damage 检查改为场景驱动）。
+
+至此 app-v2-spec 的 A–D 四个阶段全部完成。
 
 ### 3.6 SDE 版本不一致（已修复：引擎 `v0.2.1` 内置 `sde-3586130-r7`）
 
