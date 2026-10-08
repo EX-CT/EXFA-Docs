@@ -55,7 +55,7 @@ the products built on it (EXFA Desktop, EXFA Web, EXFA Cloud, EXFA MCP). This re
 | 24 | [migration-handoff](docs/24-migration-handoff.md) | 历史 | eve-* → EXFA-* 迁移交接（已完成） |
 | 25 | [pyfa-parity-audit](docs/25-pyfa-parity-audit.md) | 现行 | 迁移后 Pyfa 功能对齐审计 |
 | 26 | [deployment-options](docs/26-deployment-options.md) | 参考 | web 部署方案调研（Pages 已上线，Cloudflare 备选） |
-| 27 | [v2-handoff](docs/27-v2-handoff.md) | 现行 | v2 大升级进度与交接（全部仓库；App 细节见 EXFA-App `docs/v2/`） |
+| 27 | [v2-handoff](docs/27-v2-handoff.md) | 现行 | v2 交接；§5 为 Format/批量引擎/配置组完整方案（已落地：Format v1.1.0、Engine v0.2.2、App Stage E；§5.7 为实施状态） |
 
 旧项目的交接文档、进度记录、草稿和工具存档于 [`history/eve-fit-docs/`](history/eve-fit-docs/)。
 `tools/render_inventory.py` 由 19 的 YAML 生成其 Markdown 表格与 CSV。
