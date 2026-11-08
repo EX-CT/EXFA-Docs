@@ -240,3 +240,5 @@ type ComputeResponse =
 | EXFA-App | Stage E（PR #6, `ceb0218`） | `@exfa/format` v1.1.0；装备 `id` 赋值与 `ensureItemIds` 回填；`ui/Groups.tsx` 组编辑器+逐实例结果表；工作区注册表+`ws` 标记分库+切换器+陈旧响应代际防护；`engineCompute`/`computeCalc`/`computeBatch` 能力探测+回退；单配置导出为 `exfa/package@1` 依赖闭包；内置 WASM→v0.2.2 |
 
 已覆盖的验收项：①（compute.rs `shorthand_equals_explicit`、`explicit_values_always_win`）、②（`batch_fits_normalize_and_echo_ids`、variants 归一化基线）、⑤（`projected_fit_select_whitelist` + bench `unit_sel_*`）、⑦（Engine CI 原生+WASM 套件；Format TS/Rust 校验；App 70 vitest + CI web/mcp/mcp-engine）。③④⑥ 的端到端情形（完整包导入空工作区、1+10+1 组、动态闭环提示）由格式/App 单测覆盖编译与合并语义；UI 侧动态闭环仍以 issues/告警呈现，未实现耦合求解（符合第一阶段边界）。
+
+> **2026-11 更新**：`sde-update` 自动轮询已移除，SDE 改为本地手动采纳，见 [28-update-policy.md](28-update-policy.md)。
